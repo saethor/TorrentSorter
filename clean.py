@@ -14,13 +14,11 @@ from collections import defaultdict
 ## REGEX CONSTANTS ##
 
 # parse string and stop when keywords season/series/sería are reached
-get_name_cut_on_season_re = r'(.*)((?= *season|series|sería))'
+get_name_cut_on_season_re = r'(.*)((?= *season|series|sería))|(.*)((?=.S\d\d?))|(.*)((?= *S\d\dE\d\d))'
 # parse string and stop when pattern S01E02 are reached
 get_name_cut_on_episode_re = r'(.*)((?= *S\d\dE\d\d))'
 
 # regex for the number of the season
-# S\d\d?|(?<=season|sería|series|s) *\d\d?
-# r'S\d\d?|(?<=season|sería|series|s) *\d\d?|(?<=season|sería|series) *\d\d'
 get_season_number = r'S\d\d?|(?<=season) *\d\d?|S\d\d?|(?<=sería) *\d\d?|S\d\d?|(?<=series) *\d\d?|(?<!\d)\d\d?(?=\. *season)|(?<!\d)\d\d?(?=\. *sería)|(?<!\d)\d\d?(?=\. *series)'
 
 # regex for finding a season
