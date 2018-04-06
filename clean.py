@@ -16,7 +16,7 @@ def nothing():
 
 def getName(directory):
     name = re.search(
-        r'([\w\d \-\)\(\.\']*)((?= \d\d?. sería))|([\w\d \-\)\(\.\']*)((?= *season))|([\w\d \-\)\(\.\']*)((?= *sería))|([\w\d \-\)\(\.\']*)((?=\.\d\d\d\.))|([\w\d \-\)\(\.\']*)((?= *S\d))', directory, re.IGNORECASE)
+        r'(.*)((?= *season|series|sería|S\d\d?|\.\d))', directory, re.IGNORECASE)
     if name is not None:
         return name.group()
     else:
@@ -26,7 +26,7 @@ def getName(directory):
 # Function that extracts the number of the TV show from the folder name
 def getNumber(directory):
     number = re.search(
-        r'S\d\d?|(?<=season\s)\d\d?|(?<=sería\s)\d\d?', directory, re.IGNORECASE)
+        r'S\d\d?|(?<=season|sería|series\s)\d\d?', directory, re.IGNORECASE)
     if number is not None:
         return number.group()
     else:
@@ -75,8 +75,9 @@ def main(argv):
                             splitted = directory.split('-')
                             print('SPLITTED')
                             print(splitted[1])
-                    print(directory)
+                    # print(directory)
                 else:
+                    print(directory)
                     print('move\n' + getName(directory) + '\nto new location\n')
                     nothing()
                     # if re.search(r'((series)|(sería)|(season))\s*\d\d?\s*\-\s*\d\d?|S\d{2}e\d\d?\s*\-\s*\d\d?', directory, re.IGNORECASE | re.UNICODE):

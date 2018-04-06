@@ -8,6 +8,10 @@ r'(sería|season|series) *\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series
 # If folder is contains only season and number
 r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|series) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])'
 
+# Get name of TV show
+r'(.*)((?= *season|series|sería|S\d\d?|\.\d))'
+
+# Get number of season
 
 # OLDER REGEX
 # Folder that is a single season IGNORES the keyword 'series'
@@ -20,7 +24,7 @@ r'(?<![ \d\w.])(\d\d?\. *(season|sería))|(?<![ \d\w.])(season|sería) *\d\d?|(?
 # find name of show
 r'([\w\d \-\)\(\.]*)((?= \d\d?. sería))|([\w\d \-\)\(\.]*)((?= *season))|([\w\d \-\)\(\.]*)((?= *sería))|([\w\d \-\)\(\.]*)((?=\.\d\d\d\.))|([\w\d \-\)\(\.]*)((?= *S\d))'
 # Find the number of season
-r'S\d\d?|(?<=season\s)\d\d?|(?<=sería\s)\d\d?'
+r'S\d\d?|(?<=season|sería|series\s)\d\d?'
 
 
 # TEST STRING
