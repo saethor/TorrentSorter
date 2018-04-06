@@ -11,14 +11,16 @@ import unicodedata
 import argparse
 
 
-def nothing():
-    two = 1 + 1
-    # Function that extracts the name of the TV show from the folder name
+# REGEX
+get_name_re = r'(.*)((?= *season|series|sería|S\d\d?|\.\d))'
+get_episode_number = r'S\d\d?|(?<=season|sería|series\s)\d\d?'
+get_season_re = r'(sería|season|series) *\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series)|(S\d\d?(?!\w))'
+check_show_name_missing = r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|series) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])'
+# Function that extracts the name of the TV show from the folder name
 
 
 def getName(directory):
-    name = re.search(
-        r'(.*)((?= *season|series|sería|S\d\d?|\.\d))', directory, re.IGNORECASE)
+    name = re.search(get_name_re, directory, re.IGNORECASE)
     if name is not None:
         return name.group()
     else:
@@ -27,8 +29,7 @@ def getName(directory):
 
 # Function that extracts the number of the TV show from the folder name
 def getNumber(directory):
-    number = re.search(
-        r'S\d\d?|(?<=season|sería|series\s)\d\d?', directory, re.IGNORECASE)
+    number = re.search(get_episode_number, directory, re.IGNORECASE)
     if number is not None:
         return number.group()
     else:
@@ -36,20 +37,20 @@ def getNumber(directory):
 
 
 def main(source, dest):
-    # Check if source folder exists 
+    # Check if source folder exists
     if not os.path.isdir(source):
         raise ValueError(
             'Invalid arguments\nRun clean.py <source_folder> <destination_folder>')
 
     if not os.path.isdir(dest):
-        os.makedirs(dest)  
+        os.makedirs(dest)
 
     TORRENT_DAY_DOT_COM = 'www.TorrentDay.com'
     # CWD
     cwd = os.getcwd()
 
     # source path as string and Pathlib object
-    source_path = os.path.join(cwd, source)    
+    source_path = os.path.join(cwd, source)
 
     # destination path as string and Pathlib object
     dest_path = os.path.join(cwd, dest)
@@ -64,8 +65,8 @@ def main(source, dest):
             # ONLY CHECK FOR WHOLE SEASONS AND MOVE TO DESIRED LOCATION
             # normalize utf-8 to NFC if needed
             directory = unicodedata.normalize('NFC', directory)
-            if re.search(r'(sería|season|series) *\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series)|(S\d\d?(?!\w))', directory, re.IGNORECASE):
-                if re.search(r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|series) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])', directory, re.IGNORECASE):
+            if re.search(get_season_re, directory, re.IGNORECASE):
+                if re.search(check_show_name_missing, directory, re.IGNORECASE):
                     # if current directory contains name of show, create folder and move
                     # if current directory is the source directory, do something later
 
@@ -81,7 +82,6 @@ def main(source, dest):
                 else:
                     print(directory)
                     print('move\n' + getName(directory) + '\nto new location\n')
-                    nothing()
                     # if re.search(r'((series)|(sería)|(season))\s*\d\d?\s*\-\s*\d\d?|S\d{2}e\d\d?\s*\-\s*\d\d?', directory, re.IGNORECASE | re.UNICODE):
                     # print('Folder is a sequence of seasons')
                     # print(directory)
@@ -97,14 +97,15 @@ def main(source, dest):
                     # print('----------------------------------------')
                     # TODO// IN SECOND ITERATION PICK UP ALL REMAINING EPISODE FILES
 
-
-
                     # execute main function
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Downloaded Tv show Sorter")
-    parser.add_argument('source', metavar='source', type=str, help='Source of the folder containing all the tv shows')
-    parser.add_argument('dest', metavar='destination', type=str, help='Destination where sorted tv shows should end')
+    parser.add_argument('source', metavar='source', type=str,
+                        help='Source of the folder containing all the tv shows')
+    parser.add_argument('dest', metavar='destination', type=str,
+                        help='Destination where sorted tv shows should end')
     args = parser.parse_args()
 
     main(args.source, args.dest)
