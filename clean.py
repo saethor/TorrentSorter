@@ -34,6 +34,7 @@ get_single_episode_re = r'S\d\d?E\d\d'
 # regex to find a folder containing a sequence of seasons
 get_season_sequence = r'(series|season|sería|S\d\d?E) *\d\d? *\- *\d\d? *'
 
+DEBUG = False
 
 # Function that extracts the name of the TV show from the folder name
 def getName(directory, regex):
@@ -59,7 +60,11 @@ def getName(directory, regex):
 def getNumber(directory):
     number = re.search(get_season_number, directory, re.IGNORECASE)
     if number is not None:
-        return number.group()
+        season = number.group().strip()
+        season = season.replace('S', '')
+        season = season.replace('s', '')
+        season = season.zfill(2)
+        return f'Season {season}'
     else:
         return number
 
@@ -92,7 +97,7 @@ def main(source, dest):
     Path(os.path.join(Path(source_path), 'TEMP_FOLDER')).mkdir(exist_ok=True)
     temp = os.path.join(source, 'TEMP_FOLDER')
 
-        tv_shows = set()
+    tv_shows = defaultdict(set)
 
     for path, dirs, files in os.walk(source):
         # Testing stuff
@@ -100,10 +105,9 @@ def main(source, dest):
             name = getName(f, get_name_cut_on_episode_re)
             if name == None:
                 continue
-            tv_shows.add(name)
+            #tv_shows.add(name)
             continue
         # End of testing stuff
-
         for directory in dirs:
             # IN FIRST ITERATION:
             # ONLY CHECK FOR WHOLE SEASONS AND MOVE TO DESIRED LOCATION
@@ -118,34 +122,49 @@ def main(source, dest):
                     # if current directory is the source directory, do something later
                     curr_folder_name = str(Path(os.path.join(cwd, path)).name)
                     curr_path = os.path.join(cwd, path)
+                    season = getNumber(directory)
 
-                    print('TV show: ' + curr_folder_name +
-                          ' needs to be moved to correct')
+                    tv_shows[curr_folder_name].add(season)
+
+                    if DEBUG:
+                        print('TV show: ' + curr_folder_name +
+                            ' needs to be moved to correct')
                 else:
                     name = getName(directory, get_name_cut_on_season_re)
-                    number = getNumber(directory)
-                    print(number)
+                    season = getNumber(directory)
                     if name is not None and name is not '':
-                        print('TV show: ' + name +
-                              ' needs to be moved to folder')
+                        if DEBUG:                    
+                            print('TV show: ' + name +
+                                ' needs to be moved to folder')
+                        tv_shows[name].add(season)
                     else:
                         pass
             if re.search(get_single_episode_re, directory, re.IGNORECASE | re.UNICODE):
                 name = getName(directory, get_name_cut_on_episode_re)
+                season = getNumber(directory)
                 if name is not None and name is not '':
-                    print('TV show: ' + name +
-                          ' needs to be moved to folder')
+                    if DEBUG:                    
+                        print('TV show: ' + name +
+                            ' needs to be moved to folder')
+                    tv_shows[name].add(season)
                 else:
                     pass
             if re.search(get_season_sequence, directory, re.IGNORECASE | re.UNICODE):
-                print('Folder: ' + directory + ' is a sequence of seasons')
+                if DEBUG:                
+                    print('Folder: ' + directory + ' is a sequence of seasons')
+                
         for fil in files:
             fil = unicodedata.normalize('NFC', fil)
-            print('FILE: ' + fil)
+            if DEBUG:            
+                print('FILE: ' + fil)
+
     # Printing out what I found
     for show in tv_shows:
-        # print(show)
-        pass
+        path = os.path.join(dest_path, show)
+        create_folder(path)
+        for season in tv_shows[show]:
+            season_path = os.path.join(path, season)
+            create_folder(season_path)
     print(len(tv_shows))
 
 
