@@ -8,6 +8,7 @@ import re
 import shutil
 import unicodedata
 import argparse
+from collections import defaultdict
 
 
 ## REGEX CONSTANTS ##
@@ -60,6 +61,9 @@ def getNumber(directory):
     else:
         return number
 
+def create_folder(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 def main(source, dest):
     # Check if source folder exists
@@ -84,7 +88,7 @@ def main(source, dest):
     Path(os.path.join(Path(source_path), 'TEMP_FOLDER')).mkdir(exist_ok=True)
     temp = os.path.join(source, 'TEMP_FOLDER')
 
-    tv_shows = set()
+    tv_shows = defaultdict(list)
 
     for path, dirs, files in os.walk(source):
         # Testing stuff
