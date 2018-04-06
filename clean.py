@@ -88,7 +88,7 @@ def main(source, dest):
     Path(os.path.join(Path(source_path), 'TEMP_FOLDER')).mkdir(exist_ok=True)
     temp = os.path.join(source, 'TEMP_FOLDER')
 
-    tv_shows = defaultdict(list)
+     tv_shows = set()
 
     for path, dirs, files in os.walk(source):
         # Testing stuff
