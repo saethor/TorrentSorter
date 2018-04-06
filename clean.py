@@ -21,7 +21,7 @@ get_name_cut_on_episode_re = r'(.*)((?= *S\d\dE\d\d))'
 # regex for the number of the season
 # S\d\d?|(?<=season|sería|series|s) *\d\d?
 # r'S\d\d?|(?<=season|sería|series|s) *\d\d?|(?<=season|sería|series) *\d\d'
-get_season_number = r'S\d\d?|(?<=season) *\d\d?|S\d\d?|(?<=sería) *\d\d?|S\d\d?|(?<=series) *\d\d?'
+get_season_number = r'S\d\d?|(?<=season) *\d\d?|S\d\d?|(?<=sería) *\d\d?|S\d\d?|(?<=series) *\d\d?|(?<!\d)\d\d?(?=\. *season)|(?<!\d)\d\d?(?=\. *sería)|(?<!\d)\d\d?(?=\. *series)'
 
 # regex for finding a season
 get_season_re = r'(sería|season|series) *\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series)|(S\d\d?(?!\w))'
@@ -63,9 +63,11 @@ def getNumber(directory):
     else:
         return number
 
+
 def create_folder(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
 
 def main(source, dest):
     # Check if source folder exists
@@ -90,7 +92,7 @@ def main(source, dest):
     Path(os.path.join(Path(source_path), 'TEMP_FOLDER')).mkdir(exist_ok=True)
     temp = os.path.join(source, 'TEMP_FOLDER')
 
-     tv_shows = set()
+        tv_shows = set()
 
     for path, dirs, files in os.walk(source):
         # Testing stuff
