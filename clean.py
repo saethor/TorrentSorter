@@ -54,51 +54,27 @@ def main(argv):
 
     # Create TEMP Folder for destination content
     Path(os.path.join(Path(source_path), 'TEMP_FOLDER')).mkdir(exist_ok=True)
-    Path(os.path.join(Path(source_path), 'TEST')).mkdir(exist_ok=True)
-
-    test = os.path.join(source, 'TEST')
     temp = os.path.join(source, 'TEMP_FOLDER')
-
-    # move test folder to temp folder
-    try:
-        shutil.move(test, temp)
-    except shutil.Error:
-        pass
-        # Search source folder and find tv shows
 
     for path, dirs, files in os.walk(source):
         for directory in dirs:
             # IN FIRST ITERATION:
             # ONLY CHECK FOR WHOLE SEASONS AND MOVE TO DESIRED LOCATION
-
             # normalize utf-8 to NFC if needed
             directory = unicodedata.normalize('NFC', directory)
-            if re.search(r'((sería)|(season)) *\d\d?(?!\-| \-)|(S\d\d?(?![\d\w]))|(?<!\d)(\d\d?[ .]*((season)|(sería)))', directory, re.IGNORECASE):
-                if re.search(r'(?<![ \d\w.])(\d\d?\. *(season|sería))|(?<![ \d\w.])(season|sería) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])', directory, re.IGNORECASE):
+            if re.search(r'(sería|season|series) *\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series)|(S\d\d?(?!\w))', directory, re.IGNORECASE):
+                if re.search(r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|series) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])', directory, re.IGNORECASE):
                     # if current directory contains name of show, create folder and move
                     # if current directory is the source directory, do something later
 
                     curr_folder_name = str(Path(os.path.join(cwd, path)).name)
                     curr_path = os.path.join(cwd, path)
-
-                    # print(getNumber(directory))
-                    # print(show)
                     if curr_path != source_path:
                         # If the folder name starts with the torrent string then remove it and regex search the rest for the name
                         if TORRENT_DAY_DOT_COM in directory:
                             splitted = directory.split('-')
                             print('SPLITTED')
                             print(splitted[1])
-
-                        # Create directory for show
-
-                        # Path(os.path.join(Path(curr_path), directory)).mkdir(
-                        #     exist_ok=True)
-
-                    # try:
-                    #     shutil.move(curr_path, source_str + '/TEMP_FOLDER')
-                    # except shutil.Error:
-                    #     print('Directory already exists')
                     print(directory)
                 else:
                     print('move\n' + getName(directory) + '\nto new location\n')

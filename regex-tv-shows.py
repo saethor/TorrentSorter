@@ -1,13 +1,15 @@
-# Regex match
 import re
-# sample files or folders
-# cd1 cd2
-# subtitle files and folders
 
-# Season folders: season 1, season1-2, season.01, season1, sería, S1, S01
-# Season files: s01e01, ((107, 110) season 1 episode 7 and 10)
+# NEWER REGEX
+
+# Folder that is a season
+r'(sería|season|series) *\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series)|(S\d\d?(?!\w))'
+
+# If folder is contains only season and number
+r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|series) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])'
 
 
+# OLDER REGEX
 # Folder that is a single season IGNORES the keyword 'series'
 r'((sería)|(season)) *\d\d?(?!\-| \-)|(S\d\d?(?![\d\w]))|(?<!\d)(\d\d?[ .]*((season)|(sería)))'
 
