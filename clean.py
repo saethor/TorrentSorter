@@ -18,7 +18,9 @@ get_name_cut_on_season_re = r'(.*)((?= *season|series|sería))'
 get_name_cut_on_episode_re = r'(.*)((?= *S\d\dE\d\d))'
 
 # regex for the number of the season
-get_season_number = r'S\d\d?|(?<=season|sería|series\s) *\d\d?|(?<=season|sería|series) *\d\d'
+# S\d\d?|(?<=season|sería|series|s) *\d\d?
+# r'S\d\d?|(?<=season|sería|series|s) *\d\d?|(?<=season|sería|series) *\d\d'
+get_season_number = r'S\d\d?|(?<=season) *\d\d?|S\d\d?|(?<=sería) *\d\d?|S\d\d?|(?<=series) *\d\d?'
 
 # regex for finding a season
 get_season_re = r'(sería|season|series) *\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series)|(S\d\d?(?!\w))'
@@ -115,6 +117,8 @@ def main(source, dest):
                           ' needs to be moved to correct')
                 else:
                     name = getName(directory, get_name_cut_on_season_re)
+                    number = getNumber(directory)
+                    print(number)
                     if name is not None and name is not '':
                         print('TV show: ' + name +
                               ' needs to be moved to folder')
