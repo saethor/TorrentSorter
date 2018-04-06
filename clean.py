@@ -20,7 +20,22 @@ def getName(directory):
     name = re.search(
         r'([\w\d \-\)\(\.\']*)((?= \d\d?. sería))|([\w\d \-\)\(\.\']*)((?= *season))|([\w\d \-\)\(\.\']*)((?= *sería))|([\w\d \-\)\(\.\']*)((?=\.\d\d\d\.))|([\w\d \-\)\(\.\']*)((?= *S\d))', directory, re.IGNORECASE)
     if name is not None:
-        return name.group()
+        name = name.group()
+
+        # Check if string is dott seperated      
+        show_name = name.split('.')
+        
+        if len(show_name) == 1:
+            show_name = name.split('-')
+        
+        show_name = ' '.join(show_name)
+
+        # Remove punctuation
+        show_name = ''.join(show_name.split("'")).title()
+
+        # Remove non-alphabet chars from string
+        show_name = re.sub(r'[^a-zA-Z ]+', '', show_name)
+        return show_name.strip()
     else:
         return name
 
@@ -58,7 +73,18 @@ def main(source, dest):
     Path(os.path.join(Path(source_path), 'TEMP_FOLDER')).mkdir(exist_ok=True)
     temp = os.path.join(source, 'TEMP_FOLDER')
 
+    tv_shows = set()
+
     for path, dirs, files in os.walk(source):
+        # Testing stuff
+        for f in files:
+            name = getName(f)
+            if name == None:
+                continue
+            tv_shows.add(name)
+            continue
+        # End of testing stuff
+
         for directory in dirs:
             # IN FIRST ITERATION:
             # ONLY CHECK FOR WHOLE SEASONS AND MOVE TO DESIRED LOCATION
@@ -75,30 +101,34 @@ def main(source, dest):
                         # If the folder name starts with the torrent string then remove it and regex search the rest for the name
                         if TORRENT_DAY_DOT_COM in directory:
                             splitted = directory.split('-')
-                            print('SPLITTED')
-                            print(splitted[1])
-                    print(directory)
+                            # print('SPLITTED')
+                            # print(splitted[1])
+                    # print(directory)
                 else:
-                    print('move\n' + getName(directory) + '\nto new location\n')
+                    # print('move\n' + getName(directory) + '\nto new location\n')
                     nothing()
                     # if re.search(r'((series)|(sería)|(season))\s*\d\d?\s*\-\s*\d\d?|S\d{2}e\d\d?\s*\-\s*\d\d?', directory, re.IGNORECASE | re.UNICODE):
-                    # print('Folder is a sequence of seasons')
-                    # print(directory)
-                    # print('----------------------------------------')
+                    # # print('Folder is a sequence of seasons')
+                    # # print(directory)
+                    # # print('----------------------------------------')
 
                     # IN SECOND ITERATION:
                     # PICK UP ALL REMAINING EPISODE FOLDERS
                     # If the folder is an episode of a show
 
                     # if re.search(r'S\d{2}E\d{2}', directory, re.IGNORECASE | re.UNICODE):
-                    # print('Folder is a single episode')
-                    # print(directory)
-                    # print('----------------------------------------')
+                    # # print('Folder is a single episode')
+                    # # print(directory)
+                    # # print('----------------------------------------')
                     # TODO// IN SECOND ITERATION PICK UP ALL REMAINING EPISODE FILES
 
 
 
                     # execute main function
+    # Printing out what I found
+    for show in tv_shows:
+        print(show)
+    print(len(tv_shows))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Downloaded Tv show Sorter")
