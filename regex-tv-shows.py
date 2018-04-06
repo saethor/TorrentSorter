@@ -11,21 +11,14 @@ r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|ser
 # Get name of TV show
 r'(.*)((?= *season|series|sería|S\d\d?|\.\d))'
 
+# Get folder containing a sequence of series for a given tv show
+r'(series|season|sería|S\d\d?E) *\d\d? *\- *\d\d? *'
+
 # Get number of season
-
-# OLDER REGEX
-# Folder that is a single season IGNORES the keyword 'series'
-r'((sería)|(season)) *\d\d?(?!\-| \-)|(S\d\d?(?![\d\w]))|(?<!\d)(\d\d?[ .]*((season)|(sería)))'
-
-# Check if folder only contains season and number
-r'(?<![ \d\w.])(\d\d?\. *(season|sería))|(?<![ \d\w.])(season|sería) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])'
-
-
-# find name of show
-r'([\w\d \-\)\(\.]*)((?= \d\d?. sería))|([\w\d \-\)\(\.]*)((?= *season))|([\w\d \-\)\(\.]*)((?= *sería))|([\w\d \-\)\(\.]*)((?=\.\d\d\d\.))|([\w\d \-\)\(\.]*)((?= *S\d))'
-# Find the number of season
 r'S\d\d?|(?<=season|sería|series\s)\d\d?'
 
+# Folder or file that is a single episode
+r'S\d\d?E\d\d'
 
 # TEST STRING
 
@@ -54,10 +47,3 @@ Californication S07E1 - 9
 Dragons Den S2
 Just a minute series 12-14
 Dragons Den(UK) Season 6
-
-
-# Folder that is a sequence of seasons
-r'((series)|(sería)|(season))\s*\d\d?\s*\-\s*\d\d?|S\d{2}e\d\d?\s*\-\s*\d\d?'
-
-# Folder that is a single episode
-r'S\d{2}E\d{2}'
