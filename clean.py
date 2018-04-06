@@ -8,6 +8,8 @@ import re
 import shutil
 import unicodedata
 
+import argparse
+
 
 def nothing():
     two = 1 + 1
@@ -33,22 +35,22 @@ def getNumber(directory):
         return number
 
 
-def main(argv):
-    if len(sys.argv) < 3:
+def main(source, dest):
+    # Check if source folder exists 
+    if not os.path.isdir(source):
         raise ValueError(
-            'Invalid argument count\nRun clean.py <source_folder> <destination_folder>')
-    else:
-        source = sys.argv[1]
-        dest = sys.argv[2]
-        if not os.path.isdir(source) or not os.path.isdir(dest):
-            raise ValueError(
-                'Invalid arguments\nRun clean.py <source_folder> <destination_folder>')
+            'Invalid arguments\nRun clean.py <source_folder> <destination_folder>')
+
+    if not os.path.isdir(dest):
+        os.makedirs(dest)  
 
     TORRENT_DAY_DOT_COM = 'www.TorrentDay.com'
     # CWD
     cwd = os.getcwd()
+
     # source path as string and Pathlib object
-    source_path = os.path.join(cwd, source)
+    source_path = os.path.join(cwd, source)    
+
     # destination path as string and Pathlib object
     dest_path = os.path.join(cwd, dest)
 
@@ -97,4 +99,11 @@ def main(argv):
 
 
                     # execute main function
-main(sys.argv)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Downloaded Tv show Sorter")
+    parser.add_argument('source', metavar='source', type=str, help='Source of the folder containing all the tv shows')
+    parser.add_argument('dest', metavar='destination', type=str, help='Destination where sorted tv shows should end')
+    args = parser.parse_args()
+
+    main(args.source, args.dest)
