@@ -32,9 +32,60 @@ get_single_episode_re = r'S\d\d?E\d\d'
 # regex to find a folder containing a sequence of seasons
 get_season_sequence = r'(series|season|sería|S\d\d?E) *\d\d? *\- *\d\d? *'
 
-DEBUG = False
+
+# Specific regexes for some edge cases
+
+uk_re = r'(.*)((?= \(Uk))'
+year_re = r'(19|20)\d{2}'
+
+DEBUG = True
+NOT_A_SHOW = 'NOT_A_SHOW'
 
 # Function that extracts the name of the TV show from the folder name
+
+# Common leftovers that needs to be removed from names
+IRL = 'Irl'
+CA = 'Ca'
+THE_COMPLETE = 'The Complete'
+COMPLETE = 'complete'
+UK = '(Uk)'
+
+# if name contains The complete
+# if name contains (
+# If name ends with SXX
+
+
+# Helper function that is ment for some edge cases
+# ideally this is the only function that needs to be improved over time
+def cleanName(name):
+    # Remove seasons that end with Irl
+    if name.strip().endswith(IRL):
+        name = name.strip()[:-len(IRL)]
+    # Remove seasons that end with Ca
+    if name.strip().endswith(CA):
+        name = name.strip()[:-len(CA)]
+    # Remove season that are followed by (Uk)
+    if UK in name:
+        clean_name = re.search(uk_re, name, re.IGNORECASE)
+        if clean_name is not None:
+            name = clean_name.group()
+    clean_name = re.search(year_re, name)
+    # Remove all years that are in season names
+    if clean_name is not None:
+        year = clean_name.group()
+        name = name.replace(year, '')
+    # Remove trailing season/episode pattern if they were along with the season name
+    clean_name = re.search(get_name_cut_on_season_re, name, re.IGNORECASE)
+    if clean_name is not None:
+        name = clean_name.group()
+    # Remove The Complete or Complete
+    if THE_COMPLETE in name:
+        name = name.split(THE_COMPLETE)[0]
+    if COMPLETE in name:
+        name = name.split(COMPLETE)[0]
+    return name
+
+
 def getName(directory, regex):
     name = re.search(regex, directory, re.IGNORECASE)
     if name is not None:
@@ -48,10 +99,10 @@ def getName(directory, regex):
 
         # Remove punctuation
         show_name = ''.join(show_name.split("'")).title()
-
+        show_name = cleanName(show_name)
         return show_name.strip()
     else:
-        return name
+        return directory
 
 
 # Function that extracts the number of the TV show from the folder name
@@ -64,7 +115,7 @@ def getNumber(directory):
         season = season.zfill(2)
         return f'Season {season}'
     else:
-        return number
+        return 'NOT_A_SHOW'
 
 
 def create_folder(path):
@@ -91,10 +142,6 @@ def main(source, dest):
     # destination path as string and Pathlib object
     dest_path = os.path.join(cwd, dest)
 
-    # Create TEMP Folder for destination content
-    Path(os.path.join(Path(source_path), 'TEMP_FOLDER')).mkdir(exist_ok=True)
-    temp = os.path.join(source, 'TEMP_FOLDER')
-
     tv_shows = defaultdict(set)
 
     for path, dirs, files in os.walk(source):
@@ -103,7 +150,7 @@ def main(source, dest):
             name = getName(f, get_name_cut_on_episode_re)
             if name == None:
                 continue
-            #tv_shows.add(name)
+            # tv_shows.add(name)
             continue
         # End of testing stuff
         for directory in dirs:
@@ -121,45 +168,48 @@ def main(source, dest):
                     curr_folder_name = str(Path(os.path.join(cwd, path)).name)
                     curr_path = os.path.join(cwd, path)
                     season = getNumber(directory)
-
+                    curr_folder_name = getName(
+                        curr_folder_name, get_name_cut_on_season_re)
+                    if DEBUG:
+                        print('1) TV show: ' + curr_folder_name +
+                              ' needs to be moved to correct folder')
                     tv_shows[curr_folder_name].add(season)
 
-                    if DEBUG:
-                        print('TV show: ' + curr_folder_name +
-                            ' needs to be moved to correct')
                 else:
                     name = getName(directory, get_name_cut_on_season_re)
                     season = getNumber(directory)
-                    if name is not None and name is not '':
-                        if DEBUG:                    
-                            print('TV show: ' + name +
-                                ' needs to be moved to folder')
-                        tv_shows[name].add(season)
-                    else:
-                        pass
+                    if DEBUG:
+                        print('2) TV show: ' + name +
+                              ' needs to be moved to folder')
+                    tv_shows[name].add(season)
+
             if re.search(get_single_episode_re, directory, re.IGNORECASE | re.UNICODE):
                 name = getName(directory, get_name_cut_on_episode_re)
                 season = getNumber(directory)
-                if name is not None and name is not '':
-                    if DEBUG:                    
-                        print('TV show: ' + name +
-                            ' needs to be moved to folder')
-                    tv_shows[name].add(season)
-                else:
-                    pass
+                if DEBUG:
+                    print('3) TV show: ' + name +
+                          ' needs to be moved to folder')
+                tv_shows[name].add(season)
+
             if re.search(get_season_sequence, directory, re.IGNORECASE | re.UNICODE):
-                if DEBUG:                
-                    print('Folder: ' + directory + ' is a sequence of seasons')
-                
+                # if DEBUG:
+                #     print('Folder: ' + directory + ' is a sequence of seasons')
+                pass
+
         for fil in files:
             fil = unicodedata.normalize('NFC', fil)
-            if DEBUG:            
-                print('FILE: ' + fil)
-
-    # Printing out what I found
+            episode = getName(directory, get_name_cut_on_episode_re)
+            season = getNumber(directory)
+            if season is not NOT_A_SHOW:
+                if DEBUG:
+                    print('4) Episode: ' + episode +
+                          ' needs to be moved to folder for ' + season)
+            # Printing out what I found
     for show in tv_shows:
         path = os.path.join(dest_path, show)
         create_folder(path)
+        if not DEBUG:
+            print(show)
         for season in tv_shows[show]:
             season_path = os.path.join(path, season)
             create_folder(season_path)
