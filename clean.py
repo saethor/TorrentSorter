@@ -12,7 +12,7 @@ from collections import defaultdict, Counter
 import logging
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.ERROR)
 
 shows = set()
 success = []
@@ -76,7 +76,7 @@ def moveToDest(fil, source, dest):
             logger.info(f'Copied file {source} to {dest}')
         except FileNotFoundError:
             failed.append(fil)
-            logger.error(f'Failed to copy file {source}')
+            logger.warning(f'Failed to copy file {source}')
     else:
         # TODO:: Traverse each folder and copy the files found for cases like Shameless where
         #        each episode is inside a folder
@@ -162,6 +162,9 @@ def getNumber(directory):
         season = season.replace('s', '')
         season = season.zfill(2)
         return f'Season {season}'
+    elif directory.isdigit():
+        season = directory.zfill(2)
+        return f'Season {season}'
     else:
         return 'NAME_OR_SEASON_NOT_FOUND'
 
@@ -223,8 +226,8 @@ def main(source, dest):
                                 for fil in os.listdir(source_season):
                                     fil_path = os.path.join(source_season, fil)
                                     moveToDest(fil, fil_path, season_path)
-                    if DEBUG:
-                        logger.debug(
+                    
+                    logger.debug(
                             f'TV show: {curr_folder_name} needs to be moved to correct')
                 else:
                     name = getName(directory, get_name_cut_on_season_re)
@@ -239,8 +242,9 @@ def main(source, dest):
                     for filename in os.listdir(source_season):
                         fil_path = os.path.join(source_season, filename)
                         moveToDest(filename, fil_path, season_path)
-                    if DEBUG:
-                        logging.debug(
+                    
+                    
+                    logging.debug(
                             f'TV show: {name} needs to be moved to folder')
             if re.search(get_single_episode_re, directory, re.IGNORECASE | re.UNICODE):
                 name = getName(directory, get_name_cut_on_episode_re)
@@ -254,36 +258,29 @@ def main(source, dest):
                 for filename in os.listdir(source_season):
                     fil_path = os.path.join(source_season, filename)
                     moveToDest(filename, fil_path, season_path)
-                if DEBUG:
-                    logger.debug(
+                
+                logger.debug(
                         f'TV show: {name} needs to be moved to folder')
             if re.search(get_season_sequence, directory, re.IGNORECASE | re.UNICODE):
-                if DEBUG:
-                    logger.debug(
+                
+                logger.debug(
                         f'Folder: {directory} is a sequence of seasons')
+   
+    for item in os.listdir(source_path):
+        if not os.path.isfile(os.path.join(source_path, item)):
+            continue
+        name = getName(item, get_name_cut_on_episode_re)
+        season = getNumber(item)
+        if name == NAME_OR_SEASON_NOT_FOUND or season == NAME_OR_SEASON_NOT_FOUND:
+            continue
+        
+        file_src = os.path.join(source_path, item)
+        file_dest = os.path.join(dest_path, name, season)
+        if not os.path.exists(file_dest):
+            os.makedirs(os.path.join(dest_path, name), exist_ok=True)
+            os.makedirs(os.path.join(dest_path, name, season), exist_ok=True)
+        moveToDest(item, file_src, file_dest)
 
-        for fil in files:
-            fil = unicodedata.normalize('NFC', fil)
-            name = getName(fil, get_name_cut_on_episode_re)
-            season = getNumber(fil)
-            if name == NAME_OR_SEASON_NOT_FOUND or season == NAME_OR_SEASON_NOT_FOUND:
-                continue
-            file_src = os.path.join(path, fil)
-            file_dest = os.path.join(dest_path, name, season)
-            print(file_src)
-            print(file_dest)
-            if not os.path.exists(file_dest):
-                failed.append(fil)
-                # os.makedirs(os.path.join(dest_path, name), exist_ok=True)
-                # os.makedirs(os.path.join(
-                #     dest_path, name, season), exist_ok=True)
-            try:
-                # shutil.copy(file_src, file_dest)
-                success.append(fil)
-                logger.info(f'Copied file {file_src} to {file_dest}')
-            except FileNotFoundError:
-                failed.append(fil)
-                logger.error(f'Failed to copy file {file_src}')
 
     print('--------------------------------')
     print('REPORT')
