@@ -226,9 +226,9 @@ def main(source, dest):
                                 for fil in os.listdir(source_season):
                                     fil_path = os.path.join(source_season, fil)
                                     moveToDest(fil, fil_path, season_path)
-                    
+
                     logger.debug(
-                            f'TV show: {curr_folder_name} needs to be moved to correct')
+                        f'TV show: {curr_folder_name} needs to be moved to correct')
                 else:
                     name = getName(directory, get_name_cut_on_season_re)
                     season = getNumber(directory)
@@ -242,10 +242,9 @@ def main(source, dest):
                     for filename in os.listdir(source_season):
                         fil_path = os.path.join(source_season, filename)
                         moveToDest(filename, fil_path, season_path)
-                    
-                    
+
                     logging.debug(
-                            f'TV show: {name} needs to be moved to folder')
+                        f'TV show: {name} needs to be moved to folder')
             if re.search(get_single_episode_re, directory, re.IGNORECASE | re.UNICODE):
                 name = getName(directory, get_name_cut_on_episode_re)
                 season = getNumber(directory)
@@ -258,14 +257,14 @@ def main(source, dest):
                 for filename in os.listdir(source_season):
                     fil_path = os.path.join(source_season, filename)
                     moveToDest(filename, fil_path, season_path)
-                
+
                 logger.debug(
-                        f'TV show: {name} needs to be moved to folder')
+                    f'TV show: {name} needs to be moved to folder')
             if re.search(get_season_sequence, directory, re.IGNORECASE | re.UNICODE):
-                
+
                 logger.debug(
-                        f'Folder: {directory} is a sequence of seasons')
-   
+                    f'Folder: {directory} is a sequence of seasons')
+
     for item in os.listdir(source_path):
         if not os.path.isfile(os.path.join(source_path, item)):
             continue
@@ -273,14 +272,13 @@ def main(source, dest):
         season = getNumber(item)
         if name == NAME_OR_SEASON_NOT_FOUND or season == NAME_OR_SEASON_NOT_FOUND:
             continue
-        
+
         file_src = os.path.join(source_path, item)
         file_dest = os.path.join(dest_path, name, season)
         if not os.path.exists(file_dest):
             os.makedirs(os.path.join(dest_path, name), exist_ok=True)
             os.makedirs(os.path.join(dest_path, name, season), exist_ok=True)
         moveToDest(item, file_src, file_dest)
-
 
     print('--------------------------------')
     print('REPORT')
