@@ -229,6 +229,9 @@ def main(source, dest):
     print('REPORT')
     print(f'Successfully copied {len(success)}')
     print(f'Failed: {len(failed)}')
+    print('Failed shows:')
+    for show in failed:
+        print(show)
     print('--------------------------------')
         
                 
