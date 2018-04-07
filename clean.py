@@ -161,6 +161,9 @@ def getNumber(directory):
         season = season.replace('s', '')
         season = season.zfill(2)
         return f'Season {season}'
+    elif directory.isdigit():
+        season = directory.zfill(2)
+        return f'Season {season}'
     else:
         return 'NAME_OR_SEASON_NOT_FOUND'
 
@@ -222,8 +225,8 @@ def main(source, dest):
                                 for fil in os.listdir(source_season):
                                     fil_path = os.path.join(source_season, fil)
                                     moveToDest(fil, fil_path, season_path)
-                    if DEBUG:
-                        logger.debug(
+                    
+                    logger.debug(
                             f'TV show: {curr_folder_name} needs to be moved to correct')
                 else:
                     name = getName(directory, get_name_cut_on_season_re)
@@ -239,8 +242,8 @@ def main(source, dest):
                         fil_path = os.path.join(source_season, filename)
                         moveToDest(filename, fil_path, season_path)
                     
-                    if DEBUG:
-                        logging.debug(
+                    
+                    logging.debug(
                             f'TV show: {name} needs to be moved to folder')
             if re.search(get_single_episode_re, directory, re.IGNORECASE | re.UNICODE):
                 name = getName(directory, get_name_cut_on_episode_re)
@@ -254,12 +257,12 @@ def main(source, dest):
                 for filename in os.listdir(source_season):
                     fil_path = os.path.join(source_season, filename)
                     moveToDest(filename, fil_path, season_path)
-                if DEBUG:
-                    logger.debug(
+                
+                logger.debug(
                         f'TV show: {name} needs to be moved to folder')
             if re.search(get_season_sequence, directory, re.IGNORECASE | re.UNICODE):
-                if DEBUG:
-                    logger.debug(
+                
+                logger.debug(
                         f'Folder: {directory} is a sequence of seasons')
    
     for item in os.listdir(source_path):
