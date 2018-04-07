@@ -238,6 +238,7 @@ def main(source, dest):
                     for filename in os.listdir(source_season):
                         fil_path = os.path.join(source_season, filename)
                         moveToDest(filename, fil_path, season_path)
+                    
                     if DEBUG:
                         logging.debug(
                             f'TV show: {name} needs to be moved to folder')
@@ -260,30 +261,7 @@ def main(source, dest):
                 if DEBUG:
                     logger.debug(
                         f'Folder: {directory} is a sequence of seasons')
-
-        for fil in files:
-            fil = unicodedata.normalize('NFC', fil)
-            name = getName(fil, get_name_cut_on_episode_re)
-            season = getNumber(fil)
-            if name == NAME_OR_SEASON_NOT_FOUND or season == NAME_OR_SEASON_NOT_FOUND:
-                continue
-            file_src = os.path.join(path, fil)
-            file_dest = os.path.join(dest_path, name, season)
-            # print(file_src)
-            # print(file_dest)
-            if not os.path.exists(file_dest):
-                failed.append(fil)
-                # os.makedirs(os.path.join(dest_path, name), exist_ok=True)
-                # os.makedirs(os.path.join(
-                #     dest_path, name, season), exist_ok=True)
-            try:
-                # shutil.copy(file_src, file_dest)
-                success.append(fil)
-                logger.info(f'Copied file {file_src} to {file_dest}')
-            except FileNotFoundError:
-                failed.append(fil)
-                logger.warning(f'Failed to copy file {file_src}')
-    
+   
     for item in os.listdir(source_path):
         if not os.path.isfile(os.path.join(source_path, item)):
             continue
@@ -297,11 +275,7 @@ def main(source, dest):
         if not os.path.exists(file_dest):
             os.makedirs(os.path.join(dest_path, name), exist_ok=True)
             os.makedirs(os.path.join(dest_path, name, season), exist_ok=True)
-        try:
-            shutil.copy(file_src, file_dest)
-            success.append(fil)
-        except FileNotFoundError:
-            failed.append(fil)
+        moveToDest(item, file_src, file_dest)
 
 
     print('--------------------------------')
