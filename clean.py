@@ -12,7 +12,7 @@ from collections import defaultdict, Counter
 import logging
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.ERROR)
 
 shows = set()
 success = []
@@ -75,7 +75,7 @@ def moveToDest(fil, source, dest):
             logger.info(f'Copied file {source} to {dest}')
         except FileNotFoundError:
             failed.append(fil)
-            logger.error(f'Failed to copy file {source}')
+            logger.warning(f'Failed to copy file {source}')
     else:
         # TODO:: Traverse each folder and copy the files found for cases like Shameless where
         #        each episode is inside a folder
@@ -269,8 +269,8 @@ def main(source, dest):
                 continue
             file_src = os.path.join(path, fil)
             file_dest = os.path.join(dest_path, name, season)
-            print(file_src)
-            print(file_dest)
+            # print(file_src)
+            # print(file_dest)
             if not os.path.exists(file_dest):
                 failed.append(fil)
                 # os.makedirs(os.path.join(dest_path, name), exist_ok=True)
@@ -282,7 +282,27 @@ def main(source, dest):
                 logger.info(f'Copied file {file_src} to {file_dest}')
             except FileNotFoundError:
                 failed.append(fil)
-                logger.error(f'Failed to copy file {file_src}')
+                logger.warning(f'Failed to copy file {file_src}')
+    
+    for item in os.listdir(source_path):
+        if not os.path.isfile(os.path.join(source_path, item)):
+            continue
+        name = getName(item, get_name_cut_on_episode_re)
+        season = getNumber(item)
+        if name == NAME_OR_SEASON_NOT_FOUND or season == NAME_OR_SEASON_NOT_FOUND:
+            continue
+        
+        file_src = os.path.join(source_path, item)
+        file_dest = os.path.join(dest_path, name, season)
+        if not os.path.exists(file_dest):
+            os.makedirs(os.path.join(dest_path, name), exist_ok=True)
+            os.makedirs(os.path.join(dest_path, name, season), exist_ok=True)
+        try:
+            shutil.copy(file_src, file_dest)
+            success.append(fil)
+        except FileNotFoundError:
+            failed.append(fil)
+
 
     print('--------------------------------')
     print('REPORT')
