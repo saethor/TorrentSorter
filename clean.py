@@ -63,12 +63,13 @@ TORRENT_DAY_DOT_COM = 'www.TorrentDay.com'
 
 extensions = ['avi', 'mp4', 'mov', 'mpg', 'mkv', 'm4v', 'wmv']
 
+
 def moveToDest(fil, source, dest):
     ext = fil.split('.')[-1]
     if ext.lower() not in extensions:
         return
 
-    if not os.path.isdir(source):        
+    if not os.path.isdir(source):
         try:
             shutil.copy(source, dest)
             success.append(fil)
@@ -117,7 +118,7 @@ def cleanName(name):
         name = name.split(THE_COMPLETE)[0]
     if COMPLETE in name:
         name = name.split(COMPLETE)[0]
-    
+
     # Remove extra hypens in name
     if '-' in name:
         name = ' '.join(name.split('-'))
@@ -191,7 +192,7 @@ def main(source, dest):
 
     tv_shows = defaultdict(set)
     for path, dirs, files in os.walk(source):
-        
+
         curr_path = os.path.join(cwd, path)
         for directory in dirs:
             # IN FIRST ITERATION:
