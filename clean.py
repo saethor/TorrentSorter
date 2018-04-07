@@ -127,6 +127,9 @@ def create_folder(path):
 
 
 def main(source, dest):
+    shows = set()
+    success = []
+    failed = []
     # Check if source folder exists
     if not os.path.isdir(source):
         raise ValueError(
@@ -201,7 +204,8 @@ def main(source, dest):
                     pass
             if re.search(get_season_sequence, directory, re.IGNORECASE | re.UNICODE):
                 logger.debug(f'Folder: {directory} is a sequence of seasons')
-                
+        
+        
         for fil in files:
             fil = unicodedata.normalize('NFC', fil)
             name = getName(fil, get_name_cut_on_episode_re)
@@ -213,8 +217,21 @@ def main(source, dest):
             if not os.path.exists(file_dest):
                 os.makedirs(os.path.join(dest_path, name), exist_ok=True)
                 os.makedirs(os.path.join(dest_path, name, season), exist_ok=True)
-            shutil.copy(file_src, file_dest)
-            logger.info(f'Copied file {file_src} to {file_dest}')
+            try:
+                shutil.copy(file_src, file_dest)
+                success.append(fil)
+                logger.info(f'Copied file {file_src} to {file_dest}')                
+            except FileNotFoundError:
+                failed.append(fil)
+                logger.error(f'Failed to copy file {file_src}')
+        
+    print('--------------------------------')
+    print('REPORT')
+    print(f'Successfully copied {len(success)}')
+    print(f'Failed: {len(failed)}')
+    print('--------------------------------')
+        
+                
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Downloaded Tv show Sorter")
