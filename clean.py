@@ -67,7 +67,7 @@ def moveToDest(fil, source, dest):
     ext = fil.split('.')[-1]
     if ext.lower() not in extensions:
         return
-    
+
     if not os.path.isdir(source):        
         try:
             shutil.copy(source, dest)
@@ -117,6 +117,10 @@ def cleanName(name):
         name = name.split(THE_COMPLETE)[0]
     if COMPLETE in name:
         name = name.split(COMPLETE)[0]
+    
+    # Remove extra hypens in name
+    if '-' in name:
+        name = ' '.join(name.split('-'))
     return name
 
 
