@@ -22,9 +22,10 @@ r'S\d\d?E\d\d'
 
 # TEST STRING
 
+Orange is the New Black(Full Season 3) 720p-[MULVAREPACK]
+Panic(FPS23.9)(DivX)(2000) - alcobor
 Community.S04.
 Magic's Biggest Secrets Finally Revealed season 10
-testseason 7 2313.2
 test season 7 2313.2
 season test season 7 2313.2
 testing sería 10.
@@ -42,8 +43,21 @@ Raising Hope S01
 Dexter Season2-25
 New.Girl.S02.Complete.720p.HDTV.ReEnc-[maximersk]
 Season 12
+1. Season
+1.season
 Californication S07E1-9
 Californication S07E1 - 9
 Dragons Den S2
 Just a minute series 12-14
 Dragons Den(UK) Season 6
+
+
+# Clean up show names
+# if name contains The complete
+# if name contains (
+# if name contains - or .
+# if name ends with IRL
+# If name ends with SXX
+# If name ends with CA
+# If name ends with a year (XXXX)
+#
