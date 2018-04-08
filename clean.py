@@ -170,7 +170,6 @@ def getNumber(directory):
 
 def create_show_and_season_folder(name, season, dest_path):
     '''Creates show and season directory in destination path'''
-    print(type(season))
     if not season:
         return
     show_path = os.path.join(dest_path, name)
@@ -185,6 +184,10 @@ def show_and_season_worker(directory, regex, curr_path, dest_path):
     season = getNumber(directory)
     create_show_and_season_folder(name, season, dest_path)
     source_season = os.path.join(curr_path, directory)
+    if directory == "House.of.Cards.Season.4.720p.WEBRiP.x265.ShAaNiG":
+        print(name)
+        print(season)
+        print(source_season)
     for filename in os.listdir(source_season):
         fil_path = os.path.join(source_season, filename)
         moveToDest(filename, fil_path, os.path.join(
@@ -222,7 +225,7 @@ def main(source, dest):
                     name = getName(
                         curr_folder_name, get_name_cut_on_season_re)
                     season = getNumber(directory)
-                    if name != source:
+                    if name != source.title():
                         create_show_and_season_folder(name, season, dest_path)
                         for filename in os.listdir(curr_path):
                             if filename == directory:
@@ -233,6 +236,7 @@ def main(source, dest):
                                     moveToDest(fil, fil_path, os.path.join(
                                         os.path.join(dest_path, name), season))
                 else:
+                    print(directory)
                     show_and_season_worker(
                         directory, get_name_cut_on_season_re, curr_path, dest_path)
 
