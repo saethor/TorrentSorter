@@ -70,9 +70,14 @@ def moveToDest(fil, source, dest):
     if ext.lower() not in extensions:
         return
 
+    if 'sample' in fil:
+        return
+
     if not os.path.isdir(source):
         try:
-            shutil.copy(source, dest)
+            if os.path.exists(os.path.join(dest, fil)):
+                return
+            shutil.move(source, dest)
             success.append(fil)
             logger.debug(f'Copied file {source} to {dest}')
         except FileNotFoundError:
@@ -80,7 +85,7 @@ def moveToDest(fil, source, dest):
             logger.debug(f'Failed to copy file {source}')
 
 
-def cleanName(name):
+def clean_name(name):
     '''Helper function that is ment for some edge cases
     ideally this is the only function that needs to be improved over time
     '''
@@ -115,12 +120,6 @@ def cleanName(name):
     if clean_name is not None:
         name = clean_name.group()
 
-    # Remove The Complete or Complete
-    if THE_COMPLETE in name:
-        name = name.split(THE_COMPLETE)[0]
-    if COMPLETE in name:
-        name = name.split(COMPLETE)[0]
-
     # Remove punctuation
     name = name.replace("'", "")
 
@@ -130,17 +129,19 @@ def cleanName(name):
     # Remove extra hypens in name
     name = name.replace('-', ' ')
 
-    illegal = ['_', '-', '.', ',', '(', ')', '[', ']']
+    illegal = ['_', '-', '.', ',', '(', ')', '[', ']', 'uncut', ' irl ', ' ca ', 'the complete', ' complete ' , 'torrentday', '  ']
     for i in illegal:
-        if i in name:
-            name = name[:name.find(i)]
-    return name.title()
+        if i in name.lower():
+            name = name[:name.lower().find(i)]
+
+    return name.strip()
 
 
 def get_show_name(directory, regex):
     '''Abstracts season name from directory/file name'''
     name = re.search(regex, directory, re.IGNORECASE)
     if name:
+        
         name = name.group()
         show_name = name.split('.')
 
@@ -149,10 +150,9 @@ def get_show_name(directory, regex):
 
         show_name = ' '.join(show_name)
 
-        show_name = cleanName(show_name)
-        return show_name.strip()
+        return clean_name(show_name.strip())
     else:
-        return cleanName(directory)
+        return clean_name(directory)
 
 
 def get_season(directory):
@@ -176,6 +176,10 @@ def create_show_and_season_folder(name, season, dest_path):
     '''Creates show and season directory in destination path'''
     if not season or not name:
         return
+
+    if 'sample' in name:
+        return
+
     show_path = os.path.join(dest_path, name)
     season_path = os.path.join(show_path, season)
     os.makedirs(show_path, exist_ok=True)
@@ -198,6 +202,7 @@ def show_and_season_worker(directory, regex, curr_path, dest_path):
 
 def main(source, dest):
     '''Finds tv shows and organizes them'''
+    print(source)
     # Check if source folder exists
     if not os.path.isdir(source):
         raise ValueError(
@@ -217,7 +222,9 @@ def main(source, dest):
 
     for path, dirs, files in os.walk(source):
         curr_path = os.path.join(cwd, path)
+        
         for directory in dirs:
+            
             directory = unicodedata.normalize('NFC', directory)
             if re.search(get_season_re, directory, re.IGNORECASE):
                 if re.search(check_show_name_missing, directory, re.IGNORECASE):
@@ -227,8 +234,6 @@ def main(source, dest):
                     name = get_show_name(
                         curr_folder_name, get_name_cut_on_season_re)
                     season = get_season(directory)
-                    if curr_folder_name == "30 rock":
-                        print("HEA")
                     if curr_folder_name != source:
                         create_show_and_season_folder(name, season, dest_path)
                         for filename in os.listdir(curr_path):
@@ -263,6 +268,21 @@ def main(source, dest):
         file_dest = os.path.join(dest_path, name, season)
         moveToDest(item, file_src, file_dest)
 
+    # Second run, pick up files we left behind
+    for path, dirs, files in os.walk(source):
+        curr_path = os.path.join(cwd, path)
+        for fil in files:
+            if fil.split('.')[-1] not in extensions:
+                continue
+            try:
+                name = get_show_name(fil, get_name_cut_on_episode_re)
+                season = get_season(fil)
+                if not name or not season:
+                    continue
+                create_show_and_season_folder(name, season, dest_path)
+                moveToDest(fil, os.path.join(curr_path, fil), os.path.join(dest_path, name, season))
+            except UnicodeEncodeError:
+                pass
     print(f'''
         REPORT
         ------
