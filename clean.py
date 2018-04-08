@@ -88,7 +88,10 @@ def cleanName(name):
         name = name.split('-')[1]
 
     # Remove seasons that end with Irl
+    if "Irl" in name:
+        print(name)
     if name.strip().endswith(IRL):
+        print(name)
         name = name.strip()[:-len(IRL)]
 
     # Remove seasons that end with Ca
