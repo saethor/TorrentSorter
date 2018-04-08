@@ -1,2 +1,0 @@
-Find all whole season folders and move to destination
-Find all single episode folders and move to destination

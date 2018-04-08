@@ -1,0 +1,3 @@
+Eitthvað vesen með þegar stakar möppur sem heita Sería X finnast að þegar 
+reynt er að gera path með íslenskum stöfum þá fer þetta aftur í rugl hjá mér útaf macOS
+er með öðruvisi normalization á utf-8

@@ -20,21 +20,28 @@ failed = []
 
 ## REGEX CONSTANTS ##
 
-# parse string and stop when keywords season/series/sería are reached
+# extract season name from folder
 get_name_cut_on_season_re = r'(.*)((?= *season|series|sería))|(.*)((?=.S\d\d?))|(.*)((?= *S\d\dE\d\d))'
-# parse string and stop when pattern S01E02 are reached
+# extract season name from folder
 get_name_cut_on_episode_re = r'(.*)((?= *S\d\dE\d\d))'
 
+# extract season name from single file
+get_name_from_file_re = r'(.*)((?= *season|series|sería|S\d\d?|\.\d|\d\d?x\d\d?))'
+
 # regex for the number of the season
-get_season_number = r'S\d\d?|(?<=season) *\d\d?|S\d\d?|(?<=sería) *\d\d?|S\d\d?|(?<=series) *\d\d?|(?<!\d)\d\d?(?=\. *season)|(?<!\d)\d\d?(?=\. *sería)|(?<!\d)\d\d?(?=\. *series)'
+get_season_number = r'S\d\d?|(?<=season) *\d\d?|S\d\d?|(?<=sería) *\d\d?|S\d\d?|(?<=series) *\d\d?|(?<!\d)\d\d?(?=\. *season)|(?<!\d)\d\d?(?=\. *sería)|(?<!\d)\d\d?(?=\. *series)|^\d\d?$'
 
 # regex to get the season and number as it is from the file or folder name
 get_original_season_and_number = r'(season|sería|series) *\d\d?|\d\d? *\. *(season|sería|series)'
 
 # regex for finding a season
-get_season_re = r'(sería|season|series) *\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series)|(S\d\d?(?!\w))'
+get_season_re = r'(sería|season|series) *\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series)|(S\d\d?(?!\w))|^\d\d?$'
 # helper sub-regex to determine if the name of a season folder does not contain the name of the show, then the current directory needs to be reviewed
-check_show_name_missing = r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|series) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])'
+check_show_name_missing = r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|series) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])|^\d\d?$'
+
+# regex for finding an episode
+get_episode_re = r'\d\d?x\d\d?|s\d\d?e\d\d?|\.\d\d\d?\.|(season|series|sería) *[\w\d] *(episode|þáttur) *[\d\w]'
+
 
 # regex for finding single episode as folder or file
 get_single_episode_re = r'S\d\d?E\d\d'
@@ -204,7 +211,6 @@ def main(source, dest):
             directory = unicodedata.normalize('NFC', directory)
             if re.search(get_season_re, directory, re.IGNORECASE):
                 if re.search(check_show_name_missing, directory, re.IGNORECASE):
-
                     # if current directory contains name of show, create folder and move
                     # if current directory is the source directory, do something later
                     curr_folder_name = str(Path(os.path.join(cwd, path)).name)
@@ -266,8 +272,12 @@ def main(source, dest):
                     f'Folder: {directory} is a sequence of seasons')
 
     for item in os.listdir(source_path):
+        item = unicodedata.normalize('NFC', item)
         if not os.path.isfile(os.path.join(source_path, item)):
             continue
+        if re.search(get_episode_re, item, re.IGNORECASE):
+            # print(item)
+            pass
         name = getName(item, get_name_cut_on_episode_re)
         season = getNumber(item)
         if name == NAME_OR_SEASON_NOT_FOUND or season == NAME_OR_SEASON_NOT_FOUND:

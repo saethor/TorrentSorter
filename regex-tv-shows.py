@@ -6,19 +6,29 @@ import re
 r'(sería|season|series) *\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series)|(S\d\d?(?!\w))'
 
 # If folder is contains only season and number
-r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|series) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])'
-
-# Get name of TV show
-r'(.*)((?= *season|series|sería|S\d\d?|\.\d))'
+r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|series) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])|^\d\d?'
+r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|series) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])'  # old
 
 # Get folder containing a sequence of series for a given tv show
 r'(series|season|sería|S\d\d?E) *\d\d? *\- *\d\d? *'
 
 # Get number of season
-r'S\d\d?|(?<=season|sería|series\s)\d\d?'
+r'S\d\d?|(?<=season) *\d\d?|S\d\d?|(?<=sería) *\d\d?|S\d\d?|(?<=series) *\d\d?|(?<!\d)\d\d?(?=\. *season)|(?<!\d)\d\d?(?=\. *sería)|(?<!\d)\d\d?(?=\. *series)|^\d\d?'
+r'S\d\d?|(?<=season) *\d\d?|S\d\d?|(?<=sería) *\d\d?|S\d\d?|(?<=series) *\d\d?|(?<!\d)\d\d?(?=\. *season)|(?<!\d)\d\d?(?=\. *sería)|(?<!\d)\d\d?(?=\. *series)'
 
 # Folder or file that is a single episode
 r'S\d\d?E\d\d'
+
+
+# Pick up single episodes
+r'\d\d?x\d\d?|s\d\d?e\d\d?|\.\d\d\d\d?\.|(season|series|sería) *[\w\d] *(episode|þáttur) *[\d\w]'
+
+# Get name of episode
+r'(.*)((?= *season|series|sería|S\d\d?|\.\d|\d\d?x\d\d?))'
+r'(.*)((?= *season|series|sería|S\d\d?|\.\d))'  # old regex
+
+# Get season number for episode
+r'(?<=\.)\d(?=\d\d?\.)|\d\d?(?=x\d)|(?<=s)\d\d?(?=e)|(?<=season|sería) *[\w\d]'
 
 # TEST STRING
 
