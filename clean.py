@@ -36,7 +36,7 @@ get_season_number = r'S\d\d?|(?<=season) *\d\d?|S\d\d?|(?<=sería) *\d\d?|S\d\d?
 get_original_season_and_number = r'(season|sería|series) *\d\d?|\d\d? *\. *(season|sería|series)'
 
 # regex for finding a season
-get_season_re = r'(sería|season|series) *\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series)|(S\d\d?(?!\w))|^\d\d?$'
+get_season_re = r'(sería|season|series) *\.?\d\d?(?! *\d?\-)|(?<!\d)\d\d?\. *(season|sería|series)|(S\d\d?(?!\w))|^\d\d?$'
 # helper sub-regex to determine if the name of a season folder does not contain the name of the show, then the current directory needs to be reviewed
 check_show_name_missing = r'(?<![ \d\w.])(\d\d?\. *(season|sería|series))|(?<![ \d\w.])(season|sería|series) *\d\d?|(?<![ \d\w.])S\d\d?(?![-])|^\d\d?$'
 
@@ -82,6 +82,7 @@ def moveToDest(fil, source, dest):
             shutil.copy(source, dest)
             success.append(fil)
             logger.info(f'Copied file {source} to {dest}')
+            print(fil)
         except FileNotFoundError:
             failed.append(fil)
             logger.warning(f'Failed to copy file {source}')
