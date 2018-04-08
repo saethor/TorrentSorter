@@ -129,7 +129,8 @@ def clean_name(name):
     # Remove extra hypens in name
     name = name.replace('-', ' ')
 
-    illegal = ['_', '-', '.', ',', '(', ')', '[', ']', 'uncut', ' irl ', ' ca', 'the complete', ' complete' , 'torrentday', '  ']
+    illegal = ['_', '-', '.', ',', '(', ')', '[', ']', 'uncut',
+               'the complete', ' complete', 'torrentday', '  ']
     for i in illegal:
         if i in name.lower():
             name = name[:name.lower().find(i)]
@@ -141,7 +142,7 @@ def get_show_name(directory, regex):
     '''Abstracts season name from directory/file name'''
     name = re.search(regex, directory, re.IGNORECASE)
     if name:
-        
+
         name = name.group()
         show_name = name.split('.')
 
@@ -222,9 +223,9 @@ def main(source, dest):
 
     for path, dirs, files in os.walk(source):
         curr_path = os.path.join(cwd, path)
-        
+
         for directory in dirs:
-            
+
             directory = unicodedata.normalize('NFC', directory)
             if re.search(get_season_re, directory, re.IGNORECASE):
                 if re.search(check_show_name_missing, directory, re.IGNORECASE):
@@ -280,7 +281,8 @@ def main(source, dest):
                 if not name or not season:
                     continue
                 create_show_and_season_folder(name, season, dest_path)
-                moveToDest(fil, os.path.join(curr_path, fil), os.path.join(dest_path, name, season))
+                moveToDest(fil, os.path.join(curr_path, fil),
+                           os.path.join(dest_path, name, season))
             except UnicodeEncodeError:
                 pass
     print(f'''
