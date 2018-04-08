@@ -126,7 +126,7 @@ def clean_name(name):
     # Remove extra hypens in name
     name = name.replace('-', ' ')
 
-    illegal = ['_', '-', '.', ',', '(', ')', '[', ']', 'uncut', ' irl ', ' ca ', 'the complete', ' complete ', , 'torrentday', '  ']
+    illegal = ['_', '-', '.', ',', '(', ')', '[', ']', 'uncut', ' irl ', ' ca ', 'the complete', ' complete ' , 'torrentday', '  ']
     for i in illegal:
         if i in name.lower():
             name = name[:name.lower().find(i)]
