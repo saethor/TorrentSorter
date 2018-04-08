@@ -131,7 +131,7 @@ def cleanName(name):
     for i in illegal:
         if i in name:
             name = name[:name.find(i)]
-    return name.title()
+    return name
 
 
 def get_show_name(directory, regex):
