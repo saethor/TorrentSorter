@@ -170,8 +170,7 @@ def getNumber(directory):
 
 def create_show_and_season_folder(name, season, dest_path):
     '''Creates show and season directory in destination path'''
-    print(type(season))
-    if not season:
+    if not season or not name:
         return
     show_path = os.path.join(dest_path, name)
     season_path = os.path.join(show_path, season)
@@ -183,6 +182,8 @@ def show_and_season_worker(directory, regex, curr_path, dest_path):
     '''Removed duplicated code in main, gets show name and season number, created directory and moves files'''
     name = getName(directory, regex)
     season = getNumber(directory)
+    if not season or not name:
+        return
     create_show_and_season_folder(name, season, dest_path)
     source_season = os.path.join(curr_path, directory)
     for filename in os.listdir(source_season):
@@ -256,7 +257,7 @@ def main(source, dest):
         file_dest = os.path.join(dest_path, name, season)
         moveToDest(item, file_src, file_dest)
 
-    logger.debug(f'''
+    print(f'''
         REPORT
         ------
             Successfully copied {len(success)}
