@@ -224,7 +224,9 @@ def main(source, dest):
                     name = get_show_name(
                         curr_folder_name, get_name_cut_on_season_re)
                     season = get_season(directory)
-                    if name != source:
+                    if curr_folder_name == "30 rock":
+                        print("HEA")
+                    if curr_folder_name != source:
                         create_show_and_season_folder(name, season, dest_path)
                         for filename in os.listdir(curr_path):
                             if filename == directory:
