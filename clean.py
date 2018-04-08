@@ -134,7 +134,7 @@ def cleanName(name):
     return name.title()
 
 
-def getName(directory, regex):
+def get_show_name(directory, regex):
     '''Abstracts season name from directory/file name'''
     name = re.search(regex, directory, re.IGNORECASE)
     if name:
@@ -152,7 +152,7 @@ def getName(directory, regex):
         return cleanName(directory)
 
 
-def getNumber(directory):
+def get_season(directory):
     '''Function that extracts the season number from the folder name'''
     number = re.search(get_season_number, directory, re.IGNORECASE)
     if number:
@@ -180,8 +180,8 @@ def create_show_and_season_folder(name, season, dest_path):
 
 def show_and_season_worker(directory, regex, curr_path, dest_path):
     '''Removed duplicated code in main, gets show name and season number, created directory and moves files'''
-    name = getName(directory, regex)
-    season = getNumber(directory)
+    name = get_show_name(directory, regex)
+    season = get_season(directory)
     if not season or not name:
         return
     create_show_and_season_folder(name, season, dest_path)
@@ -220,9 +220,9 @@ def main(source, dest):
                     # if current directory contains name of show, create folder and move
                     # if current directory is the source directory, do something later
                     curr_folder_name = str(Path(os.path.join(cwd, path)).name)
-                    name = getName(
+                    name = get_show_name(
                         curr_folder_name, get_name_cut_on_season_re)
-                    season = getNumber(directory)
+                    season = get_season(directory)
                     if name != source:
                         create_show_and_season_folder(name, season, dest_path)
                         for filename in os.listdir(curr_path):
@@ -246,8 +246,8 @@ def main(source, dest):
         if not os.path.isfile(os.path.join(source_path, item)):
             continue
 
-        name = getName(item, get_name_cut_on_episode_re)
-        season = getNumber(item)
+        name = get_show_name(item, get_name_cut_on_episode_re)
+        season = get_season(item)
 
         if not name or not season:
             continue
