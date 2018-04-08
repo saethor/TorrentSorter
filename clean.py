@@ -27,7 +27,7 @@ get_name_cut_on_episode_re = r'(.*)((?= *S\d\dE\d\d))'
 get_name_from_file_re = r'(.*)((?= *season|series|sería|S\d\d?|\.\d|\d\d?x\d\d?))'
 
 # regex for the number of the season
-get_season_number = r'S\d\d?|(?<=season) *\d\d?|S\d\d?|(?<=sería) *\d\d?|S\d\d?|(?<=series) *\d\d?|(?<!\d)\d\d?(?=\. *season)|(?<!\d)\d\d?(?=\. *sería)|(?<!\d)\d\d?(?=\. *series)|^\d\d?$'
+get_season_number = r'S\d\d?|(?<=season) *\.?\d\d?|S\d\d?|(?<=sería) *\.?\d\d?|S\d\d?|(?<=series) *\.?\d\d?|(?<!\d)\d\d?(?=\. *season)|(?<!\d)\d\d?(?=\. *sería)|(?<!\d)\d\d?(?=\. *series)|^\d\d?$'
 
 # regex to get the season and number as it is from the file or folder name
 get_original_season_and_number = r'(season|sería|series) *\d\d?|\d\d? *\. *(season|sería|series)'
@@ -170,7 +170,7 @@ def getNumber(directory):
 
 def create_show_and_season_folder(name, season, dest_path):
     '''Creates show and season directory in destination path'''
-    if not season:
+    if not season or not name:
         return
     show_path = os.path.join(dest_path, name)
     season_path = os.path.join(show_path, season)
@@ -182,6 +182,8 @@ def show_and_season_worker(directory, regex, curr_path, dest_path):
     '''Removed duplicated code in main, gets show name and season number, created directory and moves files'''
     name = getName(directory, regex)
     season = getNumber(directory)
+    if not season or not name:
+        return
     create_show_and_season_folder(name, season, dest_path)
     source_season = os.path.join(curr_path, directory)
     if directory == "House.of.Cards.Season.4.720p.WEBRiP.x265.ShAaNiG":
@@ -260,7 +262,7 @@ def main(source, dest):
         file_dest = os.path.join(dest_path, name, season)
         moveToDest(item, file_src, file_dest)
 
-    logger.debug(f'''
+    print(f'''
         REPORT
         ------
             Successfully copied {len(success)}
