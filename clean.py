@@ -10,6 +10,7 @@ import unicodedata
 import argparse
 from collections import defaultdict, Counter
 import logging
+import platform
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
@@ -66,7 +67,7 @@ CA = 'Ca'
 THE_COMPLETE = 'The Complete'
 COMPLETE = 'complete'
 UK = '(Uk)'
-TORRENT_DAY_DOT_COM = 'www.TorrentDay.com'
+TORRENT_DAY = 'Torrentday'
 
 extensions = ['avi', 'mp4', 'mov', 'mpg', 'mkv', 'm4v', 'wmv']
 
@@ -97,9 +98,8 @@ def moveToDest(fil, source, dest):
 # Helper function that is ment for some edge cases
 # ideally this is the only function that needs to be improved over time
 def cleanName(name):
-
-    # if TORRENT_DAY_DOT_COM in directory:
-        #     directory = directory.split('-')[1]
+    if TORRENT_DAY in name:
+        name = name.split('-')[1]
     # Remove seasons that end with Irl
     if name.strip().endswith(IRL):
         name = name.strip()[:-len(IRL)]
@@ -198,7 +198,7 @@ def main(source, dest):
 
     # CWD
     cwd = os.getcwd()
-
+    print(platform.system())
     # source path as string and Pathlib object
     source_path = os.path.join(cwd, source)
 
@@ -221,7 +221,7 @@ def main(source, dest):
                     curr_folder_name = str(Path(os.path.join(cwd, path)).name)
                     name = getName(
                         curr_folder_name, get_name_cut_on_season_re)
-                    season = getNumber(directory)        
+                    season = getNumber(directory)
                     if name != source:
                         show_path = os.path.join(
                             dest_path, name)
@@ -239,7 +239,7 @@ def main(source, dest):
 
                     logger.debug(
                         f'TV show: {name} needs to be moved to correct')
-                else:                    
+                else:
                     name = getName(directory, get_name_cut_on_season_re)
                     season = getNumber(directory)
                     show_path = os.path.join(dest_path, name)
