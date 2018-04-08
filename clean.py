@@ -126,9 +126,14 @@ def cleanName(name):
     if COMPLETE in name:
         name = name.split(COMPLETE)[0]
 
+    # Remove punctuation
+    name = name.replace("'", "")
+
+    # Replace . with space if any
+    name = name.replace('.', ' ')
+
     # Remove extra hypens in name
-    if '-' in name:
-        name = ' '.join(name.split('-'))
+    name = name.replace('-', ' ')
     return name
 
 
@@ -148,7 +153,7 @@ def getName(directory, regex):
         show_name = cleanName(show_name)
         return show_name.strip()
     else:
-        return directory
+        return cleanName(directory)
 
 
 def getOriginalSeasonAndNumber(directory):
@@ -214,13 +219,12 @@ def main(source, dest):
                     # if current directory contains name of show, create folder and move
                     # if current directory is the source directory, do something later
                     curr_folder_name = str(Path(os.path.join(cwd, path)).name)
-                    curr_folder_name = getName(
+                    name = getName(
                         curr_folder_name, get_name_cut_on_season_re)
-                    season = getNumber(directory)
-
-                    if curr_folder_name != source:
+                    season = getNumber(directory)        
+                    if name != source:
                         show_path = os.path.join(
-                            dest_path, curr_folder_name)
+                            dest_path, name)
                         season_path = os.path.join(show_path, season)
                         os.makedirs(show_path, exist_ok=True)
                         os.makedirs(season_path, exist_ok=True)
@@ -234,8 +238,8 @@ def main(source, dest):
                                     moveToDest(fil, fil_path, season_path)
 
                     logger.debug(
-                        f'TV show: {curr_folder_name} needs to be moved to correct')
-                else:
+                        f'TV show: {name} needs to be moved to correct')
+                else:                    
                     name = getName(directory, get_name_cut_on_season_re)
                     season = getNumber(directory)
                     show_path = os.path.join(dest_path, name)
@@ -267,7 +271,6 @@ def main(source, dest):
                 logger.debug(
                     f'TV show: {name} needs to be moved to folder')
             if re.search(get_season_sequence, directory, re.IGNORECASE | re.UNICODE):
-
                 logger.debug(
                     f'Folder: {directory} is a sequence of seasons')
 
