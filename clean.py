@@ -134,7 +134,12 @@ def cleanName(name):
 
     # Remove extra hypens in name
     name = name.replace('-', ' ')
-    return name
+
+    illegal = ['_', '-', '.', ',', '(', ')', '[', ']']
+    for i in illegal:
+        if i in name:
+            name = name[:name.find(i)]
+    return name.title()
 
 
 def getName(directory, regex):
