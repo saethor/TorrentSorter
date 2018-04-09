@@ -91,17 +91,6 @@ def clean_name(name):
     '''Helper function that is ment for some edge cases
     ideally this is the only function that needs to be improved over time
     '''
-    # if TORRENT_DAY in name:
-    #     name = name.split('-')[1]
-
-    # # Remove seasons that end with Irl
-    # if name.strip().endswith(IRL):
-    #     name = name.strip()[:-len(IRL)]
-
-    # # Remove seasons that end with Ca
-    # if name.strip().endswith(CA):
-    #     name = name.strip()[:-len(CA)]
-
     # Remove season that are followed by (Uk)
     if UK in name:
         clean_name = re.search(uk_re, name, re.IGNORECASE)
@@ -130,9 +119,6 @@ def clean_name(name):
 
     name = name.replace(SUPERSEED_ORG, '')
     name = name.replace('sample', '')
-
-    # TESTING
-    name = name.replace("Marvels", '')
 
     illegal = ['_', '-', '.', ',', '(', ')', '[', ']', 'uncut',
                'the complete', ' complete', 'torrentday', '  ']
