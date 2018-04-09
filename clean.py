@@ -19,7 +19,7 @@ failed = []
 ## REGEX CONSTANTS ##
 
 # extract season name from folder
-get_name_cut_on_season_re = r'(.*)((?= *season|series|sería))|(.*)((?=.S\d\d?))|(.*)((?= *S\d\dE\d\d))'
+get_name_cut_on_season_re = r'(.*)(?= *\d\d?\. *s)|(.*)(?= *season|series|sería)|(.*)(?=.S\d\d?)|(.*)(?= *S\d\dE\d\d)'
 # extract season name from folder
 get_name_cut_on_episode_re = r'(.*)((?= *S\d\dE\d\d))'
 
@@ -52,6 +52,7 @@ get_season_sequence = r'(series|season|sería|S\d\d?E) *\d\d? *\- *\d\d? *'
 
 uk_re = r'(.*)((?= \(Uk))'
 year_re = r'(19|20)\d{2}'
+remove_prefix_season_info = r'^s\d\d?e\d\d?|^s\d\d?'
 
 # Common leftovers that needs to be removed from names
 IRL = 'Irl'
@@ -60,6 +61,7 @@ THE_COMPLETE = 'The Complete'
 COMPLETE = 'complete'
 UK = '(Uk)'
 TORRENT_DAY = 'Torrentday'
+SUPERSEED_ORG = 'download at superseeds org'
 
 extensions = ['avi', 'mp4', 'mov', 'mpg', 'mkv', 'm4v', 'wmv']
 
@@ -89,19 +91,16 @@ def clean_name(name):
     '''Helper function that is ment for some edge cases
     ideally this is the only function that needs to be improved over time
     '''
-    if TORRENT_DAY in name:
-        name = name.split('-')[1]
+    # if TORRENT_DAY in name:
+    #     name = name.split('-')[1]
 
-    # Remove seasons that end with Irl
-    if "Irl" in name:
-        print(name)
-    if name.strip().endswith(IRL):
-        print(name)
-        name = name.strip()[:-len(IRL)]
+    # # Remove seasons that end with Irl
+    # if name.strip().endswith(IRL):
+    #     name = name.strip()[:-len(IRL)]
 
-    # Remove seasons that end with Ca
-    if name.strip().endswith(CA):
-        name = name.strip()[:-len(CA)]
+    # # Remove seasons that end with Ca
+    # if name.strip().endswith(CA):
+    #     name = name.strip()[:-len(CA)]
 
     # Remove season that are followed by (Uk)
     if UK in name:
@@ -129,20 +128,27 @@ def clean_name(name):
     # Remove extra hypens in name
     name = name.replace('-', ' ')
 
+    name = name.replace(SUPERSEED_ORG, '')
+    name = name.replace('sample', '')
+
+    # TESTING
+    name = name.replace("Marvels", '')
+
     illegal = ['_', '-', '.', ',', '(', ')', '[', ']', 'uncut',
                'the complete', ' complete', 'torrentday', '  ']
     for i in illegal:
         if i in name.lower():
             name = name[:name.lower().find(i)]
-
-    return name.strip()
+    temp = re.search(remove_prefix_season_info, name, re.IGNORECASE)
+    if temp is not None:
+        name = name.replace(temp.group(), '')
+    return name.title().strip()
 
 
 def get_show_name(directory, regex):
     '''Abstracts season name from directory/file name'''
     name = re.search(regex, directory, re.IGNORECASE)
     if name:
-
         name = name.group()
         show_name = name.split('.')
 
@@ -150,7 +156,6 @@ def get_show_name(directory, regex):
             show_name = name.split('-')
 
         show_name = ' '.join(show_name)
-
         return clean_name(show_name.strip())
     else:
         return clean_name(directory)
@@ -203,7 +208,6 @@ def show_and_season_worker(directory, regex, curr_path, dest_path):
 
 def main(source, dest):
     '''Finds tv shows and organizes them'''
-    print(source)
     # Check if source folder exists
     if not os.path.isdir(source):
         raise ValueError(
@@ -285,6 +289,13 @@ def main(source, dest):
                            os.path.join(dest_path, name, season))
             except UnicodeEncodeError:
                 pass
+
+    # Finally remove empty directories in source folder
+    for path, dirs, files in os.walk(dest):
+        curr_path = os.path.join(cwd, path)
+        for directory in dirs:
+            if os.listdir(os.path.join(curr_path, directory)) == []:
+                os.rmdir(os.path.join(curr_path, directory))
     print(f'''
         REPORT
         ------
